@@ -272,6 +272,78 @@ npm run lint
 - Annotations use relative paths from workspace root
 - Ensure you're opening the same workspace folder as when annotations were created
 
+## Technical Notes
+
+### VS Code Extension UI Options
+
+This section documents the available approaches for rendering custom UI in VS Code extensions, based on research into the extension API.
+
+#### CodeLens Limitations
+CodeLens is a common approach but has significant drawbacks:
+- Affects line heights (pushes content down)
+- Limited to text-based clickable links
+- Minimal styling options
+- Runs out-of-process, complicating state management
+
+#### Decorations API (Current Approach)
+The **Decorations API** is the most flexible option for inline UI and is what this extension uses:
+
+```typescript
+const decorationType = vscode.window.createTextEditorDecorationType({
+  after: {
+    contentText: ' // annotation text',
+    color: 'rgba(153, 153, 153, 0.7)',
+    fontStyle: 'italic'
+  },
+  gutterIconPath: '/path/to/icon.svg',
+  gutterIconSize: 'contain'
+});
+```
+
+**Capabilities:**
+- Inject content via CSS `::before` and `::after` pseudo-elements
+- Add glyph margin icons
+- Apply custom colors, backgrounds, borders
+- Show hover messages on decorations
+- Customize for light/dark themes separately
+
+**Limitations:**
+- No arbitrary HTML rendering
+- No direct click events on inline content (only gutter icons)
+- Limited to CSS-styled elements
+
+#### Hover Provider (Complementary)
+For rich contextual information without affecting layout:
+
+```typescript
+vscode.languages.registerHoverProvider('*', {
+  provideHover(document, position) {
+    return new vscode.Hover(['**Bold** and `code`', 'Multi-line content']);
+  }
+});
+```
+
+Shows markdown-rendered tooltips on hover—good for detailed annotation content.
+
+#### WebView Panels
+For complex UI requiring full HTML/CSS/JS, but renders in a side panel—not inline in the editor. Useful for:
+- Browsing/editing all annotations
+- Annotation management UI
+- Settings panels
+
+#### What's NOT Available to Extensions
+VS Code internally uses Monaco editor widgets (content widgets, overlay widgets, view zones), but **these are NOT exposed to the extension API**. Extensions run sandboxed for security and stability reasons.
+
+#### Reference Extensions
+- **GitLens**: Uses decorations for inline blame with hover for details
+- **ErrorLens**: Uses decorations + diagnostics API for inline error display
+
+### Recommended Architecture
+For annotation display, the optimal approach combines:
+1. **Decorations** for inline visual markers (icons, subtle text)
+2. **Hover Provider** for detailed annotation content on hover
+3. **WebView sidebar** (optional) for browsing/managing all annotations
+
 ## License
 
 ISC
