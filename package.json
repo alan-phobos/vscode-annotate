@@ -1,0 +1,168 @@
+{
+  "name": "vscode-annotate",
+  "displayName": "Code Annotate",
+  "description": "Create shareable code annotations stored in git, visible in editor but not in source code",
+  "version": "0.1.0",
+  "publisher": "your-publisher-name",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-annotate.toggleAnnotations",
+        "title": "Toggle Annotations",
+        "category": "Annotate"
+      },
+      {
+        "command": "vscode-annotate.addAnnotation",
+        "title": "Add Annotation",
+        "category": "Annotate"
+      },
+      {
+        "command": "vscode-annotate.configureRepo",
+        "title": "Configure Annotation Repository",
+        "category": "Annotate"
+      },
+      {
+        "command": "vscode-annotate.syncAnnotations",
+        "title": "Sync Annotations with Git",
+        "category": "Annotate"
+      },
+      {
+        "command": "vscode-annotate.createAnnotationComment",
+        "title": "Add Annotation",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vscode-annotate.editAnnotationComment",
+        "title": "Edit",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vscode-annotate.saveAnnotationComment",
+        "title": "Save",
+        "icon": "$(check)"
+      },
+      {
+        "command": "vscode-annotate.cancelAnnotationComment",
+        "title": "Cancel",
+        "icon": "$(close)"
+      },
+      {
+        "command": "vscode-annotate.deleteAnnotationComment",
+        "title": "Delete",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vscode-annotate.deleteAnnotationThread",
+        "title": "Delete Annotation",
+        "icon": "$(trash)"
+      }
+    ],
+    "configuration": {
+      "title": "Code Annotate",
+      "properties": {
+        "vscode-annotate.repositoryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the git repository where annotations are stored"
+        },
+        "vscode-annotate.annotationsEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show/hide annotations in the editor"
+        }
+      }
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "vscode-annotate.addAnnotation",
+          "group": "annotations@1"
+        }
+      ],
+      "comments/commentThread/title": [
+        {
+          "command": "vscode-annotate.deleteAnnotationThread",
+          "group": "navigation",
+          "when": "commentController == vscode-annotate"
+        }
+      ],
+      "comments/commentThread/context": [
+        {
+          "command": "vscode-annotate.createAnnotationComment",
+          "group": "inline",
+          "when": "commentController == vscode-annotate"
+        }
+      ],
+      "comments/comment/title": [
+        {
+          "command": "vscode-annotate.editAnnotationComment",
+          "group": "group@1",
+          "when": "commentController == vscode-annotate && comment =~ /canEdit/"
+        },
+        {
+          "command": "vscode-annotate.deleteAnnotationComment",
+          "group": "group@2",
+          "when": "commentController == vscode-annotate && comment =~ /canDelete/"
+        }
+      ],
+      "comments/comment/context": [
+        {
+          "command": "vscode-annotate.saveAnnotationComment",
+          "group": "inline@1",
+          "when": "commentController == vscode-annotate && commentIsEditing"
+        },
+        {
+          "command": "vscode-annotate.cancelAnnotationComment",
+          "group": "inline@2",
+          "when": "commentController == vscode-annotate && commentIsEditing"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "vscode-annotate.addAnnotation",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "vscode-annotate.toggleAnnotations",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "simple-git": "^3.22.0"
+  }
+}
